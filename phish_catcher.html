@@ -3,187 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Phish Catcher Game - Advanced</title>
+  <title>Phish Catcher Game</title>
   <style>
     body {
-      background: #0f172a;
-      color: #f1f5f9;
-      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
-      text-align: center;
+      padding: 0;
     }
     .container {
-      max-width: 700px;
-      margin: auto;
-      background: #1e293b;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 0 20px #0ea5e9;
+      max-width: 750px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
-    h1 { color: #38bdf8; }
-    .email-box {
-      background: #334155;
+    .email-header {
+      background: #e9eff6;
+      padding: 16px;
+      border-bottom: 1px solid #cdd7e1;
+    }
+    .email-header strong {
+      display: inline-block;
+      width: 80px;
+    }
+    .email-body {
       padding: 20px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      text-align: left;
+      font-size: 15px;
+      line-height: 1.5;
     }
-    button {
-      padding: 10px 18px;
-      margin: 8px;
+    .controls {
+      text-align: center;
+      padding: 20px;
+    }
+    .controls button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 15px;
+      background: #0a84ff;
+      color: white;
       border: none;
       border-radius: 5px;
-      background-color: #0ea5e9;
-      color: white;
-      font-size: 16px;
       cursor: pointer;
     }
-    .score, .timer {
-      font-size: 18px;
-      margin-top: 10px;
+    .status-bar {
+      text-align: center;
+      padding: 10px;
+      font-size: 16px;
     }
-    footer {
-      margin-top: 30px;
+    .footer {
+      text-align: center;
+      padding: 15px;
       font-size: 14px;
-      color: #94a3b8;
+      color: #666;
     }
-    footer a {
-      color: #38bdf8;
+    .footer a {
+      color: #0a84ff;
       text-decoration: none;
     }
-    .email-header { font-size: 14px; color: #cbd5e1; }
-    .hidden { display: none; }
-    .feedback { font-size: 16px; margin-top: 10px; }
+    .result {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🛡️ Phish Catcher</h1>
-    <p class="score">Score: <span id="score">0</span></p>
-    <p class="timer">Time Left: <span id="timer">15</span>s</p>
 
-    <div class="email-box" id="emailBox"></div>
+<div class="container">
+  <div class="email-header" id="emailHeader">
+    <div><strong>From:</strong> <span id="fromField"></span></div>
+    <div><strong>Subject:</strong> <span id="subjectField"></span></div>
+    <div><strong>Date:</strong> <span id="dateField"></span></div>
+  </div>
+  <div class="email-body" id="emailBody"></div>
+
+  <div class="controls">
     <button onclick="submitAnswer(true)">Legitimate</button>
     <button onclick="submitAnswer(false)">Phishing</button>
-    <button onclick="toggleDetails()">Toggle View</button>
-
-    <p class="feedback" id="feedback"></p>
-
-    <footer>
-      Powered by <a href="https://insec.in" target="_blank">Info Security Solution</a>
-    </footer>
+    <div class="result" id="feedback"></div>
   </div>
 
-  <script>
-    const emails = [
-      {
-        from: "admin@securemail.com",
-        subject: "Account Re-authentication Required",
-        date: "Mon, 3 June 2025 08:23:19 +0530",
-        body: "Your account requires immediate re-authentication due to security updates. Click here to verify.",
-        isPhish: true,
-        reason: "Urgency and suspicious link"
-      },
-      {
-        from: "hr@company.com",
-        subject: "Updated Leave Policy",
-        date: "Mon, 3 June 2025 09:45:10 +0530",
-        body: "Dear team, please find attached the updated leave policy effective from next month.",
-        isPhish: false,
-        reason: "Consistent sender and no action needed"
-      },
-      {
-        from: "support@paypal-alert.com",
-        subject: "Unusual Login Activity",
-        date: "Mon, 3 June 2025 10:15:00 +0530",
-        body: "We've noticed an unusual login. Click here to secure your account.",
-        isPhish: true,
-        reason: "Look-alike domain and urgency"
-      },
-      {
-        from: "ceo-office@company.com",
-        subject: "Internal Memo: Strategy Session Notes",
-        date: "Mon, 3 June 2025 12:00:00 +0530",
-        body: "Attached are the confidential notes from today’s leadership strategy session.",
-        isPhish: false,
-        reason: "Internal communication, no suspicious content"
-      },
-      {
-        from: "security-alert@microsoft-support.co",
-        subject: "Immediate Action Required!",
-        date: "Mon, 3 June 2025 14:32:11 +0530",
-        body: "Suspicious activity detected. Login immediately to avoid account suspension.",
-        isPhish: true,
-        reason: "Fake domain with scare tactics"
-      }
-    ];
+  <div class="status-bar">
+    Score: <span id="score">0</span> |
+    Time left: <span id="timer">20</span>s
+  </div>
 
-    let index = 0;
-    let score = 0;
-    let timer;
-    let timeLeft = 15;
-    let showingHeader = true;
+  <div class="footer">
+    Powered by <a href="https://insec.in" target="_blank">Info Security Solution</a>
+  </div>
+</div>
 
-    function loadEmail() {
-      if (index >= emails.length) {
-        document.getElementById("emailBox").innerHTML = `<strong>Game Over!</strong><br><br>
-          Final Score: ${score}/${emails.length}<br><br>
-          ${score >= 4 ? "🟢 Expert Level!" : score >= 2 ? "🟡 Average Awareness" : "🔴 Needs Training!"}`;
-        document.querySelectorAll("button").forEach(btn => btn.style.display = "none");
-        document.getElementById("timer").textContent = "0";
-        return;
-      }
+<script>
+const emails = [
+  {
+    from: "hr@company.com",
+    subject: "Your Leave Status Update",
+    date: "Jun 3, 2025, 10:15 AM",
+    body: "Hi, your leave request for July 12-14 has been approved. No further action needed.",
+    isPhish: false,
+    reason: "Standard HR notification"
+  },
+  {
+    from: "admin@securemail.com",
+    subject: "Action Required: Email Quota Exceeded",
+    date: "Jun 3, 2025, 08:10 AM",
+    body: "Your mailbox has exceeded the quota limit. Click here to increase your storage.",
+    isPhish: true,
+    reason: "Phishing link with urgency"
+  },
+  {
+    from: "support@paypal-alert.com",
+    subject: "Suspicious Login Attempt",
+    date: "Jun 2, 2025, 11:43 PM",
+    body: "We noticed an unusual login from Russia. Click to secure your account.",
+    isPhish: true,
+    reason: "Spoofed domain with scare tactic"
+  },
+  {
+    from: "ceo-office@company.com",
+    subject: "Confidential: Meeting Notes",
+    date: "Jun 3, 2025, 12:00 PM",
+    body: "Here are the notes from the strategic leadership meeting. Please do not forward.",
+    isPhish: false,
+    reason: "Internal memo, no malicious link"
+  },
+  {
+    from: "it-support@company-secure.com",
+    subject: "Password Reset Request",
+    date: "Jun 2, 2025, 09:00 PM",
+    body: "You recently requested a password reset. If this wasn’t you, click here to cancel.",
+    isPhish: true,
+    reason: "Looks legit but has social engineering hook"
+  },
+  {
+    from: "events@linkedin.com",
+    subject: "You’re invited to LinkedIn Live",
+    date: "Jun 1, 2025, 02:35 PM",
+    body: "Join us for a special event with career leaders this Friday.",
+    isPhish: false,
+    reason: "Legitimate sender and content"
+  },
+  {
+    from: "security@microsoft-updates.com",
+    subject: "Security Patch Required",
+    date: "Jun 3, 2025, 07:30 AM",
+    body: "Install the latest update to avoid potential threats. Click to download now.",
+    isPhish: true,
+    reason: "Impersonates Microsoft, misleading domain"
+  },
+  {
+    from: "training@compliance.org",
+    subject: "Mandatory Compliance Training",
+    date: "May 30, 2025, 03:20 PM",
+    body: "Complete your compliance training before June 15. Link: compliance.org/login",
+    isPhish: false,
+    reason: "Typical corporate training message"
+  },
+  {
+    from: "bank-alert@hsbc-online-secure.com",
+    subject: "Account Locked – Verification Needed",
+    date: "May 29, 2025, 06:45 AM",
+    body: "Your bank account is temporarily locked. Log in now to verify your identity.",
+    isPhish: true,
+    reason: "Fake domain and urgency"
+  },
+  {
+    from: "colleague@internalmail.com",
+    subject: "Lunch tomorrow?",
+    date: "May 28, 2025, 12:00 PM",
+    body: "Hey, free for lunch tomorrow at the usual place?",
+    isPhish: false,
+    reason: "Casual internal message"
+  }
+];
 
-      timeLeft = 15;
-      document.getElementById("timer").textContent = timeLeft;
-      document.getElementById("feedback").textContent = "";
-      showingHeader = true;
-      updateEmailDisplay();
+let index = 0;
+let score = 0;
+let timer;
+let timeLeft = 20;
 
+function loadEmail() {
+  if (index >= emails.length) {
+    document.querySelector('.email-body').innerHTML = `<strong>Game Over!</strong><br><br>Your final score is <strong>${score}/${emails.length}</strong>.`;
+    document.querySelectorAll('button').forEach(btn => btn.style.display = "none");
+    document.getElementById("timer").textContent = "0";
+    return;
+  }
+
+  const email = emails[index];
+  document.getElementById("fromField").textContent = email.from;
+  document.getElementById("subjectField").textContent = email.subject;
+  document.getElementById("dateField").textContent = email.date;
+  document.getElementById("emailBody").textContent = email.body;
+  document.getElementById("feedback").textContent = "";
+  timeLeft = 20;
+  document.getElementById("timer").textContent = timeLeft;
+
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").textContent = timeLeft;
+    if (timeLeft <= 0) {
       clearInterval(timer);
-      timer = setInterval(() => {
-        timeLeft--;
-        document.getElementById("timer").textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          index++;
-          loadEmail();
-        }
-      }, 1000);
-    }
-
-    function updateEmailDisplay() {
-      const email = emails[index];
-      const box = document.getElementById("emailBox");
-      if (showingHeader) {
-        box.innerHTML = `
-          <div class="email-header">
-            <strong>From:</strong> ${email.from}<br>
-            <strong>Subject:</strong> ${email.subject}<br>
-            <strong>Date:</strong> ${email.date}
-          </div>`;
-      } else {
-        box.innerHTML = `<p>${email.body}</p>`;
-      }
-    }
-
-    function toggleDetails() {
-      showingHeader = !showingHeader;
-      updateEmailDisplay();
-    }
-
-    function submitAnswer(answer) {
-      clearInterval(timer);
-      const correct = !emails[index].isPhish === answer;
-      if (correct) score++;
-      document.getElementById("score").textContent = score;
-      document.getElementById("feedback").textContent = `📝 ${emails[index].reason} (${correct ? "Correct ✅" : "Wrong ❌"})`;
       index++;
-      setTimeout(loadEmail, 2000);
+      loadEmail();
     }
+  }, 1000);
+}
 
-    loadEmail();
-  </script>
+function submitAnswer(answer) {
+  clearInterval(timer);
+  const email = emails[index];
+  const correct = (answer === !email.isPhish);
+  if (correct) score++;
+  document.getElementById("score").textContent = score;
+  document.getElementById("feedback").textContent = `${correct ? "✅ Correct" : "❌ Wrong"} - ${email.reason}`;
+  index++;
+  setTimeout(loadEmail, 2000);
+}
+
+loadEmail();
+</script>
+
 </body>
 </html>
