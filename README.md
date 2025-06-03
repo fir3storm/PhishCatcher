@@ -22,7 +22,13 @@ Identify each email correctly as either **Legitimate** or **Phishing** before ti
 
 ---
 
+## 🚀 Play it online
+
+https://fir3storm.github.io/PhishCatcher/phish_catcher.html
+
 ## 🚀 How to Run
+
+
 
 1. **Download or Clone** this repository:
    ```bash
